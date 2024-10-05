@@ -19,8 +19,10 @@ buttonElement.addEventListener('click', (e) => {
     setTimeout(() => {
         document.body.classList.add('slide-up');
         
+
         setTimeout(() => {
             window.location.href = buttonElement.href; 
         }, 500); 
     }, 300); 
 });
+
