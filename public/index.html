@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
 </head>
 <body>
-    <div class="container">
-
-        <video autoplay loop muted plays-inline class="background-clip">
-            <source src = "../src/assets/ziemia.mp4" type="video/mp4">
-        </video>
-        <div class="content">
-            <h1>Hackathon</h1>
-            <a href="#" class="blink">Press any button</a>
-        </div>
-    </div>
+    
+    <script type="module" src="../src/js/main.js"></script>
 </body>
 </html>
