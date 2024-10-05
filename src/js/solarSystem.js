@@ -1,13 +1,16 @@
+
 export function solar(THREE, OrbitControls) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
+    let cameraObject;
+    let offset;
+    let kek;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-
+    
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
     objectNameDiv.style.position = 'absolute';
@@ -33,13 +36,16 @@ export function solar(THREE, OrbitControls) {
     const light = new THREE.PointLight(0xffffff, 2, 100);
     light.position.set(0, 0, 0);
     scene.add(light);
-
+    
     const sunGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     const sun = new THREE.Mesh(sunGeometry, sunMaterial);
     sun.userData = { name: "Sun", description: "The Sun is the star at the center of the Solar System." };
     scene.add(sun);
-
+    const solarSystemGroup = new THREE.Group();
+    solarSystemGroup.add(sun);
+    scene.add(solarSystemGroup);
+        
     function createPlanet(size, color, distance, name, description) {
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
         const planetMaterial = new THREE.MeshLambertMaterial({ color: color });
@@ -71,7 +77,7 @@ export function solar(THREE, OrbitControls) {
     const celestialBodies = planets.map(p => p.planet);
     celestialBodies.push(sun);
 
-    camera.position.z = 25;
+    camera.position.set(0, 0, 30);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -84,7 +90,7 @@ export function solar(THREE, OrbitControls) {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
+    
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
 
@@ -95,14 +101,15 @@ export function solar(THREE, OrbitControls) {
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
     }
-
+    
     function onMouseClick(event) {
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(celestialBodies);
-
+        
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
-
+            cameraObject = clickedObject;
+            const independentPosition = getIndependentPosition(clickedObject);
             // Display detailed info about the clicked planet/sun
             infoSection.innerHTML = `<h2>${clickedObject.userData.name}</h2><p>${clickedObject.userData.description}</p>`;
             infoSection.style.display = 'block';
@@ -111,9 +118,20 @@ export function solar(THREE, OrbitControls) {
             infoSection.style.display = 'none';
         }
     }
-
+    function getIndependentPosition(obj) {
+        const worldPosition = new THREE.Vector3();
+        obj.getWorldPosition(worldPosition); // Używamy getWorldPosition
+        return {
+            x: worldPosition.x,
+            y: worldPosition.y,
+            z: worldPosition.z
+        };
+    }
     function animate() {
         requestAnimationFrame(animate);
+
+        offset = new THREE.Vector3(0, 0, 0); 
+        //solarSystemGroup.position.copy(offset);
 
         sun.rotation.y += 0.005;
 
@@ -121,7 +139,11 @@ export function solar(THREE, OrbitControls) {
             const { planet, pivot } = item;
             pivot.rotation.y += 0.01 / (index + 1);
         });
-
+        kek = getIndependentPosition(cameraObject);
+        controls.target.set(kek.x,
+            kek.y,
+            kek.z);
+        camera.position.set(kek.x,kek.y,kek.z+5)
         controls.update();
         renderer.render(scene, camera);
 
@@ -140,6 +162,7 @@ export function solar(THREE, OrbitControls) {
         } else {
             objectNameDiv.style.display = 'none';
         }
+        
     }
 
     animate();

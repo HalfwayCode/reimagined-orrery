@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         videoElement.pause();
         videoElement.classList.add('hidden');
+        
         solar(THREE, OrbitControls);
       });
 });
