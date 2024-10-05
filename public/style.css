@@ -78,3 +78,15 @@ body {
         height: 100%;
     }
 }
+.logo {
+    position: fixed; 
+    top: 20px;
+    left: 20px;
+    z-index: 10; 
+}
+
+.logo img {
+    width: 250px; 
+    height: auto;
+    display: block;
+}

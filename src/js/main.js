@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
         e.preventDefault();
         videoElement.pause();
-        videoElement.currentTime = 0;
         videoElement.classList.add('hidden');
         solar(THREE, OrbitControls);
       });
