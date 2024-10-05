@@ -1,111 +1,124 @@
-        // Initialize scene, camera, and renderer
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+import * as THREE from 'three';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 
-        // Set background color of the scene
-        renderer.setClearColor(0x333333);
+// Create the scene, camera, and renderer
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-        // Initialize parameters
-        const a = 1;                          // semi-major axis
-        const e = 1 / Math.sqrt(2);           // eccentricity
-        const b = a * Math.sqrt(1 - e * e);   // semi-minor axis
+// Set the initial camera position
+const cameraDistance = 3;
+camera.position.set(cameraDistance, 1, cameraDistance);
+camera.lookAt(0, 0, 0);
 
-        // Define rotation functions
-        function rotate3d(point, angle, x, y, z) {
-            const cos = Math.cos(angle);
-            const sin = Math.sin(angle);
-            const rotatedX = (cos + (1 - cos) * x * x) * point[0] +
-                             ((1 - cos) * x * y - z * sin) * point[1] +
-                             ((1 - cos) * x * z + y * sin) * point[2];
-            const rotatedY = ((1 - cos) * y * x + z * sin) * point[0] +
-                             (cos + (1 - cos) * y * y) * point[1] +
-                             ((1 - cos) * y * z - x * sin) * point[2];
-            const rotatedZ = ((1 - cos) * z * x - y * sin) * point[0] +
-                             ((1 - cos) * z * y + x * sin) * point[1] +
-                             (cos + (1 - cos) * z * z) * point[2];
-            return [rotatedX, rotatedY, rotatedZ];
-        }
+// Orbit control setup
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.screenSpacePanning = false;
+controls.maxPolarAngle = Math.PI / 2;
+controls.minDistance = 1;
+controls.maxDistance = 10;
 
-        // Function to propagate position based on Kepler's laws
-        function propagate(clock) {
-            const T = 120;      // seconds
-            const n = 2 * Math.PI / T;
-            const tau = 0;      // time of pericenter passage
+// Orbital parameters
+const a = 1; // semi-major axis
+const e = 1 / Math.sqrt(2); // eccentricity
+const ts = 120; // Number of time slices
 
-            const M = n * (clock - tau);
-            const E = keplerSolve(e, M);
-            const cose = Math.cos(E); // compute cosine of E
+const clock = new THREE.Clock();
+const orbitPoints = [];
 
-            const r = a * (1 - e * cose);
-            const sX = r * ((cose - e) / (1 - e * cose));
-            const sY = r * (Math.sqrt(1 - e * e) * Math.sin(E) / (1 - e * cose));
-            const sZ = 0;
+// Function to calculate the eccentric anomaly E
+function keplerStart3(e, M) {
+  const t34 = e ** 2;
+  const t35 = e * t34;
+  const t33 = Math.cos(M);
+  return M + (-0.5 * t35 + e + (t34 + (3 / 2) * t33 * t35) * t33) * Math.sin(M);
+}
 
-            // Apply rotations
-            let point = rotate3d([sX, sY, sZ], Math.PI / 5, 0, 1, 0);
-            point = rotate3d(point, Math.PI / 4, 0, 0, 1);
-            point = rotate3d(point, Math.PI / 4, 1, 0, 0);
+function eps3(e, M, x) {
+  const t1 = Math.cos(x);
+  const t2 = -1 + e * t1;
+  const t3 = Math.sin(x);
+  const t4 = e * t3;
+  const t5 = -x + t4 + M;
+  const t6 = t5 / ((0.5 * t5 * t4 / t2) + t2);
+  return t5 / ((0.5 * t3 - (1 / 6) * t1 * t6) * e * t6 + t2);
+}
 
-            return point;
-        }
+function keplerSolve(e, M) {
+  const tol = 1.0e-14;
+  const Mnorm = M % (2 * Math.PI);
+  let E0 = keplerStart3(e, Mnorm);
+  let dE = tol + 1;
+  let count = 0;
 
-        // Kepler's equation solver
-        function keplerSolve(e, M) {
-            const tol = 1.0e-14;
-            const Mnorm = M % (2 * Math.PI);
-            let E0 = Mnorm;
-            let dE = tol + 1;
+  while (dE > tol) {
+    const E = E0 - eps3(e, Mnorm, E0);
+    dE = Math.abs(E - E0);
+    E0 = E;
+    count++;
 
-            while (dE > tol) {
-                const E = E0 - (E0 - e * Math.sin(E0) - Mnorm) / (1 - e * Math.cos(E0));
-                dE = Math.abs(E - E0);
-                E0 = E;
-            }
-            return E0;
-        }
+    if (count === 100) {
+      console.warn("KeplerSolve failed to converge!");
+      break;
+    }
+  }
+  return E0;
+}
 
-        // Create central body (star) and orbiting body
-        const centralBodyGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-        const centralBodyMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-        const centralBody = new THREE.Mesh(centralBodyGeometry, centralBodyMaterial);
-        scene.add(centralBody);
+// Generate orbit points and create orbit point spheres
+for (let i = 0; i < ts; i++) {
+  const M = (2 * Math.PI / ts) * i; // Mean anomaly
+  const E = keplerSolve(e, M); // Solve for Eccentric anomaly
+  const r = a * (1 - e * Math.cos(E));
+  
+  // 3D positions considering rotation
+  const x = r * (Math.cos(E) - e); // Adjusted for focus
+  const y = r * Math.sqrt(1 - e * e) * Math.sin(E);
+  const z = 0; // Keep Z at 0 for now; can be adjusted for 3D
 
-        const orbitingBodyGeometry = new THREE.SphereGeometry(0.04, 32, 32);
-        const orbitingBodyMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const orbitingBody = new THREE.Mesh(orbitingBodyGeometry, orbitingBodyMaterial);
-        scene.add(orbitingBody);
+  // Apply rotations to the position
+  const rotateY = new THREE.Matrix4().makeRotationY(Math.PI / 5);
+  const rotateZ = new THREE.Matrix4().makeRotationZ(Math.PI / 4);
+  const rotateX = new THREE.Matrix4().makeRotationX(Math.PI / 4);
+  
+  const position = new THREE.Vector3(x, y, z).applyMatrix4(rotateY).applyMatrix4(rotateZ).applyMatrix4(rotateX);
+  orbitPoints.push(position);
+  
+  // Create a small sphere at each orbit point
+  const orbitPointGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+  const orbitPointMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const orbitPointMesh = new THREE.Mesh(orbitPointGeometry, orbitPointMaterial);
+  orbitPointMesh.position.copy(position);
+  scene.add(orbitPointMesh);
+}
 
-        // Create elliptical path
-        const curve = new THREE.EllipseCurve(0, 0, 
-            a, b, 
-            0, 2 * Math.PI, 
-            false, 
-            0
-        );
-        const points = curve.getPoints(100);
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        const ellipse = new THREE.Line(geometry, material);
-        scene.add(ellipse);
+// Create the orbit path using LineSegments
+const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+const orbitMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+scene.add(orbitLine);
 
-        // Set camera position
-        camera.position.z = 5;
+// Create a small moving body
+const bodyGeometry = new THREE.SphereGeometry(0.04, 8, 8);
+const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
+scene.add(bodyMesh);
 
-        // Animation loop
-        const ts = 120;  // Number of time slices
+let currentIndex = 0;
 
-        function animate() {
-            requestAnimationFrame(animate);
-            // Clear positions on each frame
-            const loc = propagate(clock);
-            orbitingBody.position.set(loc[0], loc[1], loc[2]);
-            renderer.render(scene, camera);
-        }
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update(); // Update orbit controls
 
-        // Set an initial clock
-        let clock = 1;
+  // Update the position of the moving body
+  bodyMesh.position.copy(orbitPoints[currentIndex]);
+  currentIndex = (currentIndex + 1) % orbitPoints.length; // Loop through orbit points
 
-        animate();
+  renderer.render(scene, camera);
+}
+
+animate();
