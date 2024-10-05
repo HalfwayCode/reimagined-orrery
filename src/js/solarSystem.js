@@ -66,6 +66,13 @@ export function solar(THREE, OrbitControls) {
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
 
+    // Update camera and renderer on window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
     document.addEventListener('mousemove', onMouseMove, false);
 
     function onMouseMove(event) {
