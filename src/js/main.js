@@ -1,26 +1,26 @@
+
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { solar } from './solarSystem.js';
 
+
 document.addEventListener('DOMContentLoaded', function () {
-    
-    const videoElement = document.querySelector('.background-clip');
-    const buttonElement = document.getElementById('button');
+    solar(THREE, OrbitControls); 
+});
 
-    buttonElement.addEventListener('click', (e) => {
+const videoElement = document.querySelector('.background-clip');
+const buttonElement = document.getElementById('button');
 
-        setTimeout(() => {
-            document.body.classList.add('slide-up'); 
-            
-            
-            setTimeout(() => {
-                window.location.href = button.href; 
-            }, 500); 
-        }, 300); 
+buttonElement.addEventListener('click', (e) => {
+    e.preventDefault(); 
+    videoElement.pause();
+    videoElement.classList.add('hidden');
+
+    setTimeout(() => {
+        document.body.classList.add('slide-up');
         
-        e.preventDefault();
-        videoElement.pause();
-        videoElement.classList.add('hidden');
-        solar(THREE, OrbitControls);
-      });
+        setTimeout(() => {
+            window.location.href = buttonElement.href; 
+        }, 500); 
+    }, 300); 
 });
