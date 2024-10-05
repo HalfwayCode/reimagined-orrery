@@ -166,4 +166,5 @@ export function solar(THREE, OrbitControls) {
     }
 
     animate();
+    
 }
