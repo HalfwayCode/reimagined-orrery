@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         setTimeout(() => {
             document.body.classList.add('slide-up'); 
-            
-            
             setTimeout(() => {
                 window.location.href = button.href; 
             }, 500); 
