@@ -18,6 +18,18 @@ export function solar(THREE, OrbitControls) {
     objectNameDiv.style.display = 'none'; // Initially hidden
     document.body.appendChild(objectNameDiv);
 
+    // Create a section to display detailed info about the clicked planet
+    const infoSection = document.createElement('div');
+    infoSection.style.position = 'absolute';
+    infoSection.style.top = '50px';
+    infoSection.style.right = '50px';
+    infoSection.style.color = 'white';
+    infoSection.style.padding = '20px';
+    infoSection.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    infoSection.style.borderRadius = '10px';
+    infoSection.style.display = 'none'; // Initially hidden
+    document.body.appendChild(infoSection);
+
     const light = new THREE.PointLight(0xffffff, 2, 100);
     light.position.set(0, 0, 0);
     scene.add(light);
@@ -25,15 +37,15 @@ export function solar(THREE, OrbitControls) {
     const sunGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-    sun.userData = { name: "Sun" };
+    sun.userData = { name: "Sun", description: "The Sun is the star at the center of the Solar System." };
     scene.add(sun);
 
-    function createPlanet(size, color, distance, name) {
+    function createPlanet(size, color, distance, name, description) {
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
         const planetMaterial = new THREE.MeshLambertMaterial({ color: color });
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
-        planet.userData = { name };
+        planet.userData = { name, description };
 
         const pivot = new THREE.Object3D();
         pivot.position.set(0, 0, 0);
@@ -46,14 +58,14 @@ export function solar(THREE, OrbitControls) {
     }
 
     const planets = [
-        createPlanet(0.5, 0xaaaaaa, 3, "Mercury"),
-        createPlanet(0.6, 0xff4500, 5, "Venus"),
-        createPlanet(0.7, 0x0000ff, 7, "Earth"),
-        createPlanet(0.6, 0xff0000, 9, "Mars"),
-        createPlanet(1.2, 0xffa500, 12, "Jupiter"),
-        createPlanet(1.0, 0xffff00, 16, "Saturn"),
-        createPlanet(0.8, 0x00ffff, 20, "Uranus"),
-        createPlanet(0.75, 0x0000ff, 24, "Neptune")
+        createPlanet(0.5, 0xaaaaaa, 3, "Mercury", "Mercury is the smallest planet in the Solar System."),
+        createPlanet(0.6, 0xff4500, 5, "Venus", "Venus is the second planet from the Sun and is the hottest."),
+        createPlanet(0.7, 0x0000ff, 7, "Earth", "Earth is the third planet from the Sun and the only known planet to harbor life."),
+        createPlanet(0.6, 0xff0000, 9, "Mars", "Mars is the fourth planet and is often called the 'Red Planet'."),
+        createPlanet(1.2, 0xffa500, 12, "Jupiter", "Jupiter is the largest planet in the Solar System."),
+        createPlanet(1.0, 0xffff00, 16, "Saturn", "Saturn is known for its extensive ring system."),
+        createPlanet(0.8, 0x00ffff, 20, "Uranus", "Uranus is the seventh planet and has a unique sideways rotation."),
+        createPlanet(0.75, 0x0000ff, 24, "Neptune", "Neptune is the eighth planet and is known for its deep blue color.")
     ];
 
     const celestialBodies = planets.map(p => p.planet);
@@ -61,12 +73,20 @@ export function solar(THREE, OrbitControls) {
 
     camera.position.z = 25;
 
-    const controls = new OrbitControls(camera, renderer.domElement); // Use OrbitControls directly
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
 
+    // Update camera and renderer on window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
     document.addEventListener('mousemove', onMouseMove, false);
+    document.addEventListener('click', onMouseClick, false);
 
     function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -74,6 +94,22 @@ export function solar(THREE, OrbitControls) {
 
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
+    }
+
+    function onMouseClick(event) {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(celestialBodies);
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+
+            // Display detailed info about the clicked planet/sun
+            infoSection.innerHTML = `<h2>${clickedObject.userData.name}</h2><p>${clickedObject.userData.description}</p>`;
+            infoSection.style.display = 'block';
+        } else {
+            // Hide the info section if clicked on empty space
+            infoSection.style.display = 'none';
+        }
     }
 
     function animate() {
