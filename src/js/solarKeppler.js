@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+export function solarKeppler(THREE, OrbitControls) {
 
 // Create the scene, camera, and renderer
 const scene = new THREE.Scene();
@@ -9,21 +8,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Set up the camera position
-camera.position.set(15, 10, 15); // Move the camera further back
+camera.position.set(30, 20, 30); // Move the camera further back
 camera.lookAt(0, 0, 0); // Ensure it looks at the center of the scene
-
-
-// Orbit control setup
-/*
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
-controls.screenSpacePanning = false;
-controls.minPolarAngle = 0; // Allow looking all the way down
-controls.maxPolarAngle = Math.PI; // Allow looking fully up (180 degrees)
-controls.minDistance = 1;
-controls.maxDistance = 50;
-*/
 
 // Orbit control setup
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -39,10 +25,12 @@ controls.maxPolarAngle = Math.PI; // Maximum vertical angle (up)
 controls.minDistance = 1; // Minimum zoom distance
 controls.maxDistance = 50; // Maximum zoom distance
 
-
 // Kepler solver functions
 function keplerStart3(e, M) {
-  return M + e * Math.sin(M); // Simplified starting approximation
+  const t33 = Math.cos(M);
+  const t34 = e * e;
+  const t35 = e * t34;
+  return M + (-0.5 * t35 + e + (t34 + 1.5 * t33 * t35) * t33) * Math.sin(M);
 }
 
 function eps3(e, M, x) {
@@ -120,7 +108,8 @@ const planets = [
 // Generate orbit points for each planet and draw their orbits
 planets.forEach(planet => {
   const orbitPoints = [];
-  const ts = 1000; // Number of time slices for orbit points
+  const ts = 100
+; // Number of time slices for orbit points
 
   // Generate orbit points
   for (let clock = 0; clock < ts; clock++) {
@@ -141,6 +130,23 @@ planets.forEach(planet => {
   const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
   scene.add(orbitLine);
 });
+
+// Function to draw an ellipse orbit
+function drawOrbit(scene, planetParams, color = 0x000000, ts = 100) {
+  const orbitPoints = [];
+
+  // Generate orbit points over time slices
+  for (let clock = 0; clock < ts; clock++) {
+      const loc = propagate(clock, planetParams);
+      orbitPoints.push(loc);
+  }
+
+  // Create geometry for the orbit
+  const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+  const orbitMaterial = new THREE.LineBasicMaterial({ color: color });
+  const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+  scene.add(orbitLine); // Add the orbit line to the scene
+}
 
 // Create a moving body (planet) for each planet
 const planetMeshes = planets.map(planet => {
@@ -183,7 +189,6 @@ for (let i = 0; i < 1000; i++) {
 let clock = 0; // Time counter
 
 // Animation loop
-// Update the eclipse logic in your animation loop
 function animate() {
   requestAnimationFrame(animate);
   controls.update(); // Update orbit controls
@@ -197,10 +202,10 @@ function animate() {
   // Position the Sun and the Moon
   const earthPosition = propagate(clock, planets[2]); // Earth index is 2
   sunMesh.position.set(0, 0, 0); // Sun is at the origin
-
+  
   // Calculate moon's position
-  const moonOrbitRadius = 0.3; // Distance from Earth to Moon
-  const moonAngle = clock * 2 * Math.PI / 30; // Adjust speed as needed
+  const moonOrbitRadius = 0.5; // Distance from Earth to Moon (increased to 1.0 units)
+  const moonAngle = clock * 2 * Math.PI / 10; // Adjust speed as needed (increased to 10)
   moonMesh.position.x = earthPosition.x + moonOrbitRadius * Math.cos(moonAngle);
   moonMesh.position.y = earthPosition.y + moonOrbitRadius * Math.sin(moonAngle);
   moonMesh.position.z = earthPosition.z; // Keep it in the same plane
@@ -234,3 +239,4 @@ function animate() {
 }
 
 animate();
+}
