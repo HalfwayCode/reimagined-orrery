@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { solar } from './solarSystem.js';
+import { solarKeppler } from './solarKeppler.js';
 
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         videoElement.pause();
         videoElement.classList.add('hidden');
         
-        solar(THREE, OrbitControls);
+        //solar(THREE, OrbitControls);
+        solarKeppler(THREE, OrbitControls);
       });
 });
