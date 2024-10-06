@@ -260,9 +260,10 @@ export function solar(THREE, OrbitControls) {
             if (isShipModeActive){
                 isShipModeActive = false;
                 cameraMode = 0;
-                controls.enabled = false;
+                controls.enabled = true;
             }
             else {
+                camera.position.set(20, 0, 0);
                 isShipModeActive = true;
                 cameraMode = 3;
                 controls.enabled = true;
@@ -297,17 +298,52 @@ export function solar(THREE, OrbitControls) {
     }
     
     //CAMERA
-    let cameraSpeed = 0.1; // Prędkość poruszania się kamery
-    let keys = {}; // Obiekt do przechowywania stanów klawiszy
+    const speed = 0.1;
+    const keys = {};
+    let moveForward = false;
+    let moveBackward = false;
+    let moveLeft = false;
+    let moveRight = false;
 
-    // Funkcja do nasłuchiwania naciśnięć klawiszy
-    document.addEventListener('keydown', (event) => {
-        keys[event.key] = true; // Ustaw klawisz jako naciśnięty
+    // Zdarzenia klawiszy
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'w') moveForward = true;
+        if (event.key === 's') moveBackward = true;
+        if (event.key === 'a') moveRight = true;
+        if (event.key === 'd') moveLeft = true;
     });
 
-    document.addEventListener('keyup', (event) => {
-        keys[event.key] = false; // Ustaw klawisz jako nie naciśnięty
+    window.addEventListener('keyup', (event) => {
+        if (event.key === 'w') moveForward = false;
+        if (event.key === 's') moveBackward = false;
+        if (event.key === 'a') moveRight = false;
+        if (event.key === 'd') moveLeft = false;
     });
+
+    function updateCameraMovement() {
+        const direction = new THREE.Vector3();
+        const right = new THREE.Vector3();
+    
+        // Oblicz kierunek, w którym kamera patrzy
+        camera.getWorldDirection(direction);
+        direction.y = 0; // Ignorowanie osi Y, aby poruszanie było poziome
+    
+        // Oblicz wektor prawo/lewo
+        right.crossVectors(camera.up, direction).normalize();
+    
+        if (moveForward) {
+            camera.position.addScaledVector(direction, speed);
+        }
+        if (moveBackward) {
+            camera.position.addScaledVector(direction, -speed);
+        }
+        if (moveLeft) {
+            camera.position.addScaledVector(right, -speed);
+        }
+        if (moveRight) {
+            camera.position.addScaledVector(right, speed);
+        }
+    }
 
     function getIndependentPosition(obj) {
         const worldPosition = new THREE.Vector3();
@@ -344,35 +380,17 @@ export function solar(THREE, OrbitControls) {
             ship.translateZ(-2);
             ship.translateY(-0.5);
 
+            controls.enabled = false;
             //camera management
-            if (keys['w']) {
-                camera.position.z -= cameraSpeed * speedModifier * shipSpeed; // Przesunięcie do przodu
-            }
-            if (keys['s']) {
-                camera.position.z += cameraSpeed * speedModifier * shipSpeed; // Przesunięcie do tyłu
-            }
-            if (keys['a']) {
-                camera.position.x -= cameraSpeed * speedModifier * shipSpeed; // Przesunięcie w lewo
-            }
-            if (keys['d']) {
-                camera.position.x += cameraSpeed * speedModifier * shipSpeed; // Przesunięcie w prawo
-            }
-        
-            // Opcjonalnie: rotacja kamery
-            if (keys['ArrowLeft']) {
-                camera.rotation.y -= 0.01; // Obrót w lewo
-            }
-            if (keys['ArrowRight']) {
-                camera.rotation.y += 0.01; // Obrót w prawo
-            }
+            updateCameraMovement();
         }
         else{
             ship.visible = false;
+            controls.enabled = true;
             cameraWork(kek,controls,camera,cameraMode);
-            controls.update();
         }
         
-        
+        controls.update();
         
         composer.render(scene, camera);
 
