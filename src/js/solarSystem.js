@@ -1,4 +1,10 @@
 import { cameraWork } from './cameraWork.js';
+import { EffectComposer } from 'EffectComposer';
+import { RenderPass } from 'RenderPass';
+import { UnrealBloomPass } from 'UnrealBloomPass';
+import { FilmPass } from 'FilmPass';
+import { SMAAPass } from 'SMAAPass';
+
 
 export function solar(THREE, OrbitControls) {
 
@@ -12,6 +18,23 @@ export function solar(THREE, OrbitControls) {
     let cameraObject;
     let offset;
     let kek;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    //composer do post processingu
+    const composer = new EffectComposer(renderer);
+
+    const renderPass = new RenderPass( scene, camera );
+    composer.addPass( renderPass );
+
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 5, 0.4, 0.9);
+    composer.addPass(bloomPass);
+
+    const filmPass = new FilmPass( 0.2, 0.3, 1 , 0);
+    composer.addPass(filmPass);
+
+    const smaaPass = new SMAAPass();
+    composer.addPass(smaaPass);
     let cameraMode=0;
     let baseSpeed = 0.001;
     let speedModifier = 10.0;
@@ -38,13 +61,25 @@ export function solar(THREE, OrbitControls) {
     infoSection.style.display = 'none'; // Initially hidden
     document.body.appendChild(infoSection);
 
-    const light = new THREE.PointLight(0xffffff, 2, 100);
+    const light = new THREE.PointLight(0xffffff, 1, 50);
     light.position.set(0, 0, 0);
     scene.add(light);
     
     //setting background image
-    const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_stars_milky_way.jpg');
+    const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/8k_stars_milky_way.jpg');
     scene.background = spaceTexture;
+
+    //Utwórz sferę jako tło
+    const sphereGeometry = new THREE.SphereGeometry(1500, 128, 128); // Duży promień
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+        map: spaceTexture,
+        side: THREE.BackSide // Odwróć materiał, aby był widoczny z wnętrza
+    });
+    const backgroundSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(backgroundSphere);
+
+    // 3. Opcjonalnie: Ustaw sferę jako dziecko kamery
+    //camera.add(backgroundSphere); // Teraz sfera będzie obracać się razem z kamerą
 
     //load textures
     const sunTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_sun.jpg');
@@ -61,7 +96,15 @@ export function solar(THREE, OrbitControls) {
     const solarSystemGroup = new THREE.Group();
     solarSystemGroup.add(sun);
     scene.add(solarSystemGroup);
-        
+
+    function createRing(size, color) {
+        const ringGeometry = new THREE.RingGeometry(size, size + 0.5, 64); // Zewnętrzny promień + grubość
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.31 });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.rotation.x = Math.PI / 2; // Ustawienie pierścienia w poziomie
+        return ring;
+    }
+    
     function createPlanet(size, color, distance, name, description) {
         const planetTexture = new THREE.TextureLoader().load(`../../src/assets/textures/2k_${name.toLowerCase()}.jpg`)
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
@@ -77,6 +120,12 @@ export function solar(THREE, OrbitControls) {
         planet.position.set(distance, 0, 0);
         pivot.add(planet);
         console.log(planet.position.x);
+
+        if (name.toLowerCase() === 'saturn') {
+            const ring = createRing(size * 1.5, 0x998e77); // Ustal odpowiednią wielkość i kolor
+            ring.position.set(distance, 0, 0);
+            pivot.add(ring); // Dodaj pierścień do obiektu pivot
+        }
 
         return { planet, pivot };
     }
@@ -174,7 +223,7 @@ export function solar(THREE, OrbitControls) {
         kek = getIndependentPosition(cameraObject);
         cameraWork(kek,controls,camera,cameraMode);
         controls.update();
-        renderer.render(scene, camera);
+        composer.render(scene, camera);
 
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(celestialBodies);
