@@ -90,3 +90,19 @@ body {
     height: auto;
     display: block;
 }
+#scrollbar {
+    -webkit-appearance: none; 
+    appearance: none;
+    background: #ddd; 
+    height: 8px; 
+    border-radius: 5px; 
+}
+
+#scrollbar::-webkit-slider-thumb {
+    -webkit-appearance: none; 
+    appearance: none;
+    width: 16px; 
+    height: 16px; 
+    border-radius: 50%; 
+    background: #fff; 
+}
