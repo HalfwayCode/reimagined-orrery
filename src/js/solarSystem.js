@@ -26,7 +26,7 @@ export function solar(THREE, OrbitControls) {
     const renderPass = new RenderPass( scene, camera );
     composer.addPass( renderPass );
 
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 5, 0.4, 0.9);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 5, 0.4, 0.8);
     composer.addPass(bloomPass);
 
     const filmPass = new FilmPass( 0.2, 0.3, 1 , 0);
@@ -196,14 +196,14 @@ export function solar(THREE, OrbitControls) {
     
 
     const planets = [
-        createPlanet(0.5, 0xaaaaaa, 3, "Mercury", "Mercury is the smallest planet in the Solar System.", "57.91 million km", "88 days", 0, "rocky"),
+        createPlanet(0.35, 0xaaaaaa, 3, "Mercury", "Mercury is the smallest planet in the Solar System.", "57.91 million km", "88 days", 0, "rocky"),
         createPlanet(0.6, 0xff4500, 5, "Venus", "Venus is the second planet from the Sun and is the hottest.", "108.2 million km", "225 days", 0, "rocky"),
         createPlanet(0.7, 0x0000ff, 7, "Earth", "Earth is the third planet from the Sun and the only known planet to harbor life.", "149.6 million km", "365.25 days", 1, "rocky"),
         createPlanet(0.6, 0xff0000, 9, "Mars", "Mars is the fourth planet and is often called the 'Red Planet'.", "227.9 million km", "687 days", 2, "rocky"),
-        createPlanet(1.2, 0xffa500, 12, "Jupiter", "Jupiter is the largest planet in the Solar System.", "778.5 million km", "11.86 years", 75, "gas giant"),
-        createPlanet(1.0, 0xffff00, 16, "Saturn", "Saturn is known for its extensive ring system.", "1.4 billion km", "29 years", 82, "gas giant"),
-        createPlanet(0.8, 0x00ffff, 20, "Uranus", "Uranus is the seventh planet and has a unique sideways rotation.", "2.87 billion km", "84 years", 27, "ice giant"),
-        createPlanet(0.75, 0x0000ff, 24, "Neptune", "Neptune is the eighth planet and is known for its deep blue color.", "4.5 billion km", "164.8 years", 14, "ice giant")
+        createPlanet(1.3, 0xffa500, 16, "Jupiter", "Jupiter is the largest planet in the Solar System.", "778.5 million km", "11.86 years", 75, "gas giant"),
+        createPlanet(1.15, 0xffff00, 24, "Saturn", "Saturn is known for its extensive ring system.", "1.4 billion km", "29 years", 82, "gas giant"),
+        createPlanet(0.9, 0x00ffff, 38, "Uranus", "Uranus is the seventh planet and has a unique sideways rotation.", "2.87 billion km", "84 years", 27, "ice giant"),
+        createPlanet(0.9, 0x0000ff, 50, "Neptune", "Neptune is the eighth planet and is known for its deep blue color.", "4.5 billion km", "164.8 years", 14, "ice giant")
     ];
     
 
