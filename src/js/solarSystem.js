@@ -80,7 +80,7 @@ export function solar(THREE, OrbitControls) {
     scene.add(solarSystemGroup);
 
     function createRing(size, color) {
-        const ringGeometry = new THREE.RingGeometry(size, size + 0.1, 32); // Zewnętrzny promień + grubość
+        const ringGeometry = new THREE.RingGeometry(size, size + 0.5, 64); // Zewnętrzny promień + grubość
         const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.rotation.x = Math.PI / 2; // Ustawienie pierścienia w poziomie
@@ -104,7 +104,7 @@ export function solar(THREE, OrbitControls) {
         console.log(planet.position.x);
 
         if (name.toLowerCase() === 'saturn') {
-            const ring = createRing(size * 5, 0xcccccc); // Ustal odpowiednią wielkość i kolor
+            const ring = createRing(size * 2, 0x998e77); // Ustal odpowiednią wielkość i kolor
             ring.position.set(distance, 0, 0);
             pivot.add(ring); // Dodaj pierścień do obiektu pivot
         }
