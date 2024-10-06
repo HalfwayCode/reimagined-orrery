@@ -68,7 +68,7 @@ export function solar(THREE, OrbitControls) {
     scene.background = spaceTexture;
 
     //Utwórz sferę jako tło
-    const sphereGeometry = new THREE.SphereGeometry(1500, 128, 128); // Duży promień
+    const sphereGeometry = new THREE.SphereGeometry(800, 128, 128); // Duży promień
     const sphereMaterial = new THREE.MeshBasicMaterial({
         map: spaceTexture,
         side: THREE.BackSide // Odwróć materiał, aby był widoczny z wnętrza
