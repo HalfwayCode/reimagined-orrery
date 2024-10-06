@@ -60,8 +60,20 @@ export function solar(THREE, OrbitControls) {
     scene.add(light);
     
     //setting background image
-    const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_stars_milky_way.jpg');
+    const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/8k_stars_milky_way.jpg');
     scene.background = spaceTexture;
+
+    //Utwórz sferę jako tło
+    const sphereGeometry = new THREE.SphereGeometry(1500, 128, 128); // Duży promień
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+        map: spaceTexture,
+        side: THREE.BackSide // Odwróć materiał, aby był widoczny z wnętrza
+    });
+    const backgroundSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(backgroundSphere);
+
+    // 3. Opcjonalnie: Ustaw sferę jako dziecko kamery
+    //camera.add(backgroundSphere); // Teraz sfera będzie obracać się razem z kamerą
 
     //load textures
     const sunTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_sun.jpg');
@@ -81,7 +93,7 @@ export function solar(THREE, OrbitControls) {
 
     function createRing(size, color) {
         const ringGeometry = new THREE.RingGeometry(size, size + 0.5, 64); // Zewnętrzny promień + grubość
-        const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.31 });
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.rotation.x = Math.PI / 2; // Ustawienie pierścienia w poziomie
         return ring;
@@ -104,7 +116,7 @@ export function solar(THREE, OrbitControls) {
         console.log(planet.position.x);
 
         if (name.toLowerCase() === 'saturn') {
-            const ring = createRing(size * 2, 0x998e77); // Ustal odpowiednią wielkość i kolor
+            const ring = createRing(size * 1.5, 0x998e77); // Ustal odpowiednią wielkość i kolor
             ring.position.set(distance, 0, 0);
             pivot.add(ring); // Dodaj pierścień do obiektu pivot
         }
@@ -193,6 +205,7 @@ export function solar(THREE, OrbitControls) {
         planets.forEach((item, index) => {
             const { planet, pivot } = item;
             pivot.rotation.y += 0.01 / (index + 1);
+            planet.rotation.y += 0.005
         });
 
         kek = getIndependentPosition(cameraObject);
