@@ -15,7 +15,7 @@ export function cameraWork(positions, controls, camera,cameraMode) {
     controls.dampingFactor = 0.05;  // Współczynnik tłumienia
     controls.enablePan = false;     // Wyłącz przesuwanie w płaszczyźnie
     controls.minDistance = 3;       // Minimalna odległość kamery od celu
-    controls.maxDistance = 15;      // Maksymalna odległość kamery od celu (ustaw na więcej niż minDistance)
+    controls.maxDistance = 100;      // Maksymalna odległość kamery od celu (ustaw na więcej niż minDistance)
     controls.autoRotate = false;    // Możesz ustawić na true, aby włączyć automatyczne obracanie kamery
 
     // Ustaw pozycję kamery - trochę wyżej i na bok, aby mieć lepszy widok
