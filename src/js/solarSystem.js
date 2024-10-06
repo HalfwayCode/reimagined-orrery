@@ -1,3 +1,5 @@
+import { cameraWork } from './cameraWork.js';
+
 export function solar(THREE, OrbitControls) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -50,6 +52,8 @@ export function solar(THREE, OrbitControls) {
     sun.userData = { name: "Sun", description: "The Sun is the star at the center of the Solar System." };
     scene.add(sun);
 
+    cameraObject = sun;
+
     const solarSystemGroup = new THREE.Group();
     solarSystemGroup.add(sun);
     scene.add(solarSystemGroup);
@@ -68,6 +72,7 @@ export function solar(THREE, OrbitControls) {
 
         planet.position.set(distance, 0, 0);
         pivot.add(planet);
+        console.log(planet.position.x);
 
         return { planet, pivot };
     }
@@ -114,9 +119,9 @@ export function solar(THREE, OrbitControls) {
     function onMouseClick(event) {
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(celestialBodies);
-        
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
+
             cameraObject = clickedObject;
             const independentPosition = getIndependentPosition(clickedObject);
             // Display detailed info about the clicked planet/sun
@@ -127,6 +132,7 @@ export function solar(THREE, OrbitControls) {
             infoSection.style.display = 'none';
         }
     }
+
     function getIndependentPosition(obj) {
         const worldPosition = new THREE.Vector3();
         obj.getWorldPosition(worldPosition); // Używamy getWorldPosition
@@ -148,6 +154,7 @@ export function solar(THREE, OrbitControls) {
             const { planet, pivot } = item;
             pivot.rotation.y += 0.01 / (index + 1);
         });
+        cameraWork();
         kek = getIndependentPosition(cameraObject);
         controls.target.set(kek.x,
             kek.y,
