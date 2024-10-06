@@ -11,7 +11,7 @@ export function solar(THREE, OrbitControls) {
     let kek;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    
+    let cameraMode=0;
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
     objectNameDiv.style.position = 'absolute';
@@ -105,15 +105,22 @@ export function solar(THREE, OrbitControls) {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
     
+    document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
-
+    
     function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
+    }
+    function handleKeyDown(event) {
+        if (event.key === 'Escape') { // Sprawdzamy, czy naciśnięty klawisz to Escape
+            console.log('Escape pressed!');
+            cameraMode=0;
+        }
     }
     
     function onMouseClick(event) {
@@ -124,6 +131,7 @@ export function solar(THREE, OrbitControls) {
 
             cameraObject = clickedObject;
             const independentPosition = getIndependentPosition(clickedObject);
+            cameraMode=1;
             // Display detailed info about the clicked planet/sun
             infoSection.innerHTML = `<h2>${clickedObject.userData.name}</h2><p>${clickedObject.userData.description}</p>`;
             infoSection.style.display = 'block';
@@ -154,12 +162,9 @@ export function solar(THREE, OrbitControls) {
             const { planet, pivot } = item;
             pivot.rotation.y += 0.01 / (index + 1);
         });
-        cameraWork();
+
         kek = getIndependentPosition(cameraObject);
-        controls.target.set(kek.x,
-            kek.y,
-            kek.z);
-        camera.position.set(kek.x,kek.y,kek.z+5)
+        cameraWork(kek,controls,camera,cameraMode);
         controls.update();
         renderer.render(scene, camera);
 
