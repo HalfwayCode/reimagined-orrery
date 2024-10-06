@@ -18,8 +18,6 @@ export function solar(THREE, OrbitControls) {
     let cameraObject;
     let offset;
     let kek;
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
 
     //composer do post processingu
     const composer = new EffectComposer(renderer);
