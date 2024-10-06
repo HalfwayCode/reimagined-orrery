@@ -4,6 +4,7 @@ export function cameraWork(positions, controls, camera,cameraMode) {
     controls.target.set(0, 0, 0);
     camera.maxDistance=15;
     camera.minDistance=3;
+    controls.update();
     }
     if(cameraMode==1)
     {
@@ -19,6 +20,7 @@ export function cameraWork(positions, controls, camera,cameraMode) {
 
     // Ustaw pozycję kamery - trochę wyżej i na bok, aby mieć lepszy widok
     camera.position.set(positions.x, positions.y + 5, positions.z + 5);
+    controls.update();
     
     // Aktualizuj kontroler po wprowadzeniu zmian
     }
