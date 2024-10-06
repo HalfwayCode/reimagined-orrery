@@ -1,27 +1,22 @@
-
-import * as THREE from 'three';
-import { OrbitControls } from 'OrbitControls';
-
-
 document.addEventListener('DOMContentLoaded', function () {
-    solar(THREE, OrbitControls); 
+    const videoElement = document.querySelector('.background-clip');
+    const buttonElement = document.getElementById('button');
+
+    if (buttonElement) {
+        buttonElement.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            setTimeout(() => {
+                document.body.classList.add('slide-up');
+                setTimeout(() => {
+                    window.location.href = 'solarSystem.html';
+                }, 500);
+            }, 300);
+
+            if (videoElement) {
+                videoElement.pause();
+                videoElement.classList.add('hidden');
+            }
+        });
+    }
 });
-
-const videoElement = document.querySelector('.background-clip');
-const buttonElement = document.getElementById('button');
-
-buttonElement.addEventListener('click', (e) => {
-    e.preventDefault(); 
-    videoElement.pause();
-    videoElement.classList.add('hidden');
-
-    setTimeout(() => {
-        document.body.classList.add('slide-up');
-        
-
-        setTimeout(() => {
-            window.location.href = buttonElement.href; 
-        }, 500); 
-    }, 300); 
-});
-
