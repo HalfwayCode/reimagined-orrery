@@ -120,7 +120,7 @@ const planets = [
 // Generate orbit points for each planet and draw their orbits
 planets.forEach(planet => {
   const orbitPoints = [];
-  const ts = 100; // Number of time slices for orbit points
+  const ts = 1000; // Number of time slices for orbit points
 
   // Generate orbit points
   for (let clock = 0; clock < ts; clock++) {
