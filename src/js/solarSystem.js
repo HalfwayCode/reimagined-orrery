@@ -1,17 +1,21 @@
 import { cameraWork } from './cameraWork.js';
 
 export function solar(THREE, OrbitControls) {
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     let cameraObject;
     let offset;
     let kek;
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
     let cameraMode=0;
+    let baseSpeed = 0.001;
+    let speedModifier = 10.0;
+
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
     objectNameDiv.style.position = 'absolute';
@@ -108,6 +112,13 @@ export function solar(THREE, OrbitControls) {
     
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
+
+    const scrollbar = document.getElementById('scrollbar');
+
+    scrollbar.addEventListener('input', () => {
+        const value = parseInt(scrollbar.value, 10); //scrollbar.value 0-100
+        speedModifier = value / 5; //speedModifier 0-20
+    });
     
     function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -153,11 +164,11 @@ export function solar(THREE, OrbitControls) {
         offset = new THREE.Vector3(0, 0, 0); 
         //solarSystemGroup.position.copy(offset);
 
-        sun.rotation.y += 0.005;
+        sun.rotation.y += baseSpeed * speedModifier / 10;
 
         planets.forEach((item, index) => {
             const { planet, pivot } = item;
-            pivot.rotation.y += 0.01 / (index + 1);
+            pivot.rotation.y += (baseSpeed * speedModifier) / (index + 1);
         });
 
         kek = getIndependentPosition(cameraObject);
