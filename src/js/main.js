@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { solar } from './solarSystem.js';
