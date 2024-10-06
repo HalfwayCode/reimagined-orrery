@@ -1,26 +1,28 @@
+
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
-import { solarKeppler } from './solarKeppler.js';
+import { solar } from './solarSystem.js';
+
 
 document.addEventListener('DOMContentLoaded', function () {
-    
-    const videoElement = document.querySelector('.background-clip');
-    const buttonElement = document.getElementById('button');
+    solar(THREE, OrbitControls); 
+});
 
-    buttonElement.addEventListener('click', (e) => {
+const videoElement = document.querySelector('.background-clip');
+const buttonElement = document.getElementById('button');
+
+buttonElement.addEventListener('click', (e) => {
+    e.preventDefault(); 
+    videoElement.pause();
+    videoElement.classList.add('hidden');
+
+    setTimeout(() => {
+        document.body.classList.add('slide-up');
+        
 
         setTimeout(() => {
-            document.body.classList.add('slide-up'); 
-            setTimeout(() => {
-                window.location.href = button.href; 
-            }, 500); 
-        }, 300); 
-        
-        e.preventDefault();
-        videoElement.pause();
-        videoElement.classList.add('hidden');
-        
-        //solar(THREE, OrbitControls);
-        solarKeppler(THREE, OrbitControls);
-      });
+            window.location.href = buttonElement.href; 
+        }, 500); 
+    }, 300); 
 });
+
