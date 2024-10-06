@@ -105,7 +105,7 @@ export function solar(THREE, OrbitControls) {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
     
-    document.addEventListener('keydown', handleKeyDown);
+    
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
     
@@ -116,12 +116,7 @@ export function solar(THREE, OrbitControls) {
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
     }
-    function handleKeyDown(event) {
-        if (event.key === 'Escape') { // Sprawdzamy, czy naciśnięty klawisz to Escape
-            console.log('Escape pressed!');
-            cameraMode=0;
-        }
-    }
+    
     
     function onMouseClick(event) {
         raycaster.setFromCamera(mouse, camera);
@@ -137,6 +132,8 @@ export function solar(THREE, OrbitControls) {
             infoSection.style.display = 'block';
         } else {
             // Hide the info section if clicked on empty space
+            infoSection.style.display = 'none';
+            cameraMode=0;
             infoSection.style.display = 'none';
         }
     }
