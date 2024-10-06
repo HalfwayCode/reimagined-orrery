@@ -200,12 +200,12 @@ export function solar(THREE, OrbitControls) {
             cameraMode = 1;
     
             // Display detailed info about the clicked planet/sun
-            infoSection.innerHTML = `<h2>${clickedObject.userData.name}</h2>
+            infoSection.innerHTML = `<h2><b>${clickedObject.userData.name}</b></h2>
                                      <p>${clickedObject.userData.description}</p>
-                                     <p>Distance from Sun: ${clickedObject.userData.distanceFromSun}</p>
-                                     <p>Orbital Period: ${clickedObject.userData.orbitalPeriod}</p>
-                                     <p>Number of Moons: ${clickedObject.userData.numberOfMoons}</p>
-                                     <p>Type: ${clickedObject.userData.type}</p>`; // Display the type of planet
+                                     <p>Distance from Sun: <b>${clickedObject.userData.distanceFromSun}</b></p>
+                                     <p>Orbital Period: <b>${clickedObject.userData.orbitalPeriod}</b></p>
+                                     <p>Number of Moons: <b>${clickedObject.userData.numberOfMoons}</b></p>
+                                     <p>Type: <b>${clickedObject.userData.type}</b></p>`; // Display the type of planet
             infoSection.style.display = 'block';
         } else {
             // Hide the info section if clicked on empty space

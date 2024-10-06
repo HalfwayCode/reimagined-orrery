@@ -21,6 +21,10 @@ p {
     font-family: 'Comfortaa', sans-serif;
 }
 
+b {
+    font-weight: 700; /* Możesz zmienić wartość na 400, 700, 900 itp. */
+}
+
 .slide-up {
     transform: translateY(-100vh);
 }
