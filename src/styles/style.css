@@ -80,7 +80,11 @@ b {
     object-fit: cover; 
     z-index: -1; 
 }
-
+.escape{
+    color: #fff;
+    text-align: center;
+    z-index: 1; 
+}
 @media (min-aspect-ratio: 16/9) {
     .background-clip {
         width: 100%;

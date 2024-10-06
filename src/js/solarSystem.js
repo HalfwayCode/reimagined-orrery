@@ -172,6 +172,7 @@ export function solar(THREE, OrbitControls) {
     
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
+    document.addEventListener('keydown', handleKeyDown, false);
 
     const scrollbar = document.getElementById('scrollbar');
 
@@ -179,6 +180,13 @@ export function solar(THREE, OrbitControls) {
         const value = parseInt(scrollbar.value, 10); //scrollbar.value 0-100
         speedModifier = value / 5; //speedModifier 0-20
     });
+    
+    function handleKeyDown(event) {
+        if (event.key === 'Escape') {
+            cameraMode = 0;
+        }
+    }
+    
     
     function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -210,7 +218,7 @@ export function solar(THREE, OrbitControls) {
         } else {
             // Hide the info section if clicked on empty space
             infoSection.style.display = 'none';
-            cameraMode = 0;
+            
         }
     }
     
