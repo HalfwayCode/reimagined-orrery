@@ -211,11 +211,12 @@ export function solar(THREE, OrbitControls) {
         offset = new THREE.Vector3(0, 0, 0); 
         //solarSystemGroup.position.copy(offset);
 
-        sun.rotation.y += baseSpeed * speedModifier / 10;
+        sun.rotation.y += baseSpeed * speedModifier / 20;
 
         planets.forEach((item, index) => {
             const { planet, pivot } = item;
             pivot.rotation.y += (baseSpeed * speedModifier) / (index + 1);
+            planet.rotation.y += baseSpeed * speedModifier / (index + 11);
         });
 
         kek = getIndependentPosition(cameraObject);
