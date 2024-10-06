@@ -4,11 +4,12 @@ import { RenderPass } from 'RenderPass';
 import { UnrealBloomPass } from 'UnrealBloomPass';
 import { FilmPass } from 'FilmPass';
 import { SMAAPass } from 'SMAAPass';
+import { GLTFLoader } from 'GLTFLoader';
 
 
 export function solar(THREE, OrbitControls) {
 
-    const scene = new THREE.Scene();
+    let scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     const raycaster = new THREE.Raycaster();
@@ -99,6 +100,45 @@ export function solar(THREE, OrbitControls) {
     solarSystemGroup.add(sun);
     scene.add(solarSystemGroup);
 
+    const loader = new GLTFLoader();
+
+    let ship;
+    let isShipLoaded = false;
+
+    function initiateShip() {
+        return new Promise((resolve, reject) => {
+            loader.load(
+                '../../src/assets/models/ship.glb',
+                function (gltf) {
+                    ship = gltf.scene;
+                    scene.add(ship);
+                    ship.scale.set(0.2, 0.2, 0.2);
+                    ship.position.set(10, 0, 0);
+                    isShipLoaded = true;
+                    resolve(ship); // Rozwiąż obietnicę z załadowanym statkiem
+                },
+                undefined,
+                function (error) {
+                    console.error('An error occurred while loading the model:', error);
+                    reject(error); // Odrzuć obietnicę w przypadku błędu
+                }
+            );
+        });
+    }
+    
+    // Użycie funkcji jako asynchronicznej
+    async function loadShip() {
+        try {
+            await initiateShip();
+            console.log('Statek załadowany');
+        } catch (error) {
+            console.error('Błąd przy ładowaniu statku:', error);
+        }
+    }
+    
+    // Wywołaj funkcję ładującą statek
+    loadShip();
+
     function createRing(size, color) {
         const ringGeometry = new THREE.RingGeometry(size, size + 0.5, 64); // Zewnętrzny promień + grubość
         const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.31 });
@@ -187,7 +227,26 @@ export function solar(THREE, OrbitControls) {
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
     }
-    
+
+    const shipButtonElement = document.getElementById('shipButton');
+    let isShipModeActive = false;
+
+    if (shipButtonElement) {
+        shipButtonElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isShipModeActive){
+                isShipModeActive = false;
+                cameraMode = 0;
+                controls.enabled = false;
+            }
+            else {
+                isShipModeActive = true;
+                cameraMode = 3;
+                controls.enabled = true;
+            }
+            console.log(isShipModeActive);
+        });
+    }
     
     function onMouseClick(event) {
         raycaster.setFromCamera(mouse, camera);
@@ -214,7 +273,18 @@ export function solar(THREE, OrbitControls) {
         }
     }
     
-    
+    //CAMERA
+    let cameraSpeed = 0.1; // Prędkość poruszania się kamery
+    let keys = {}; // Obiekt do przechowywania stanów klawiszy
+
+    // Funkcja do nasłuchiwania naciśnięć klawiszy
+    document.addEventListener('keydown', (event) => {
+        keys[event.key] = true; // Ustaw klawisz jako naciśnięty
+    });
+
+    document.addEventListener('keyup', (event) => {
+        keys[event.key] = false; // Ustaw klawisz jako nie naciśnięty
+    });
 
     function getIndependentPosition(obj) {
         const worldPosition = new THREE.Vector3();
@@ -239,9 +309,48 @@ export function solar(THREE, OrbitControls) {
             planet.rotation.y += baseSpeed* 5 * speedModifier / (index + 11);
         });
 
+
         kek = getIndependentPosition(cameraObject);
-        cameraWork(kek,controls,camera,cameraMode);
-        controls.update();
+
+        if(isShipLoaded && isShipModeActive){
+            
+            ship.visible = true;
+            ship.position.copy(camera.position);
+            ship.rotation.set(camera.rotation.x, camera.rotation.y, camera.rotation.z);
+            ship.updateMatrix();
+            ship.translateZ(-2);
+            ship.translateY(-0.5);
+
+            //camera management
+            if (keys['w']) {
+                camera.position.z -= cameraSpeed; // Przesunięcie do przodu
+            }
+            if (keys['s']) {
+                camera.position.z += cameraSpeed; // Przesunięcie do tyłu
+            }
+            if (keys['a']) {
+                camera.position.x -= cameraSpeed; // Przesunięcie w lewo
+            }
+            if (keys['d']) {
+                camera.position.x += cameraSpeed; // Przesunięcie w prawo
+            }
+        
+            // Opcjonalnie: rotacja kamery
+            if (keys['ArrowLeft']) {
+                camera.rotation.y -= 0.01; // Obrót w lewo
+            }
+            if (keys['ArrowRight']) {
+                camera.rotation.y += 0.01; // Obrót w prawo
+            }
+        }
+        else{
+            ship.visible = false;
+            cameraWork(kek,controls,camera,cameraMode);
+            controls.update();
+        }
+        
+        
+        
         composer.render(scene, camera);
 
         raycaster.setFromCamera(mouse, camera);

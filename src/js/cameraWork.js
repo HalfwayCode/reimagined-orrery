@@ -22,5 +22,8 @@ export function cameraWork(positions, controls, camera,cameraMode) {
     
     // Aktualizuj kontroler po wprowadzeniu zmian
     }
+    if(cameraMode == 3){
+        controls.target.set(positions.x, positions.y, positions.z);
+    }
 
 }
