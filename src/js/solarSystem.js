@@ -34,9 +34,11 @@ export function solar(THREE, OrbitControls) {
 
     const smaaPass = new SMAAPass();
     composer.addPass(smaaPass);
+
     let cameraMode=0;
     let baseSpeed = 0.001;
     let speedModifier = 10.0;
+    const shipSpeed = 0.03;
 
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
@@ -331,16 +333,16 @@ export function solar(THREE, OrbitControls) {
 
             //camera management
             if (keys['w']) {
-                camera.position.z -= cameraSpeed; // Przesunięcie do przodu
+                camera.position.z -= cameraSpeed * speedModifier * shipSpeed; // Przesunięcie do przodu
             }
             if (keys['s']) {
-                camera.position.z += cameraSpeed; // Przesunięcie do tyłu
+                camera.position.z += cameraSpeed * speedModifier * shipSpeed; // Przesunięcie do tyłu
             }
             if (keys['a']) {
-                camera.position.x -= cameraSpeed; // Przesunięcie w lewo
+                camera.position.x -= cameraSpeed * speedModifier * shipSpeed; // Przesunięcie w lewo
             }
             if (keys['d']) {
-                camera.position.x += cameraSpeed; // Przesunięcie w prawo
+                camera.position.x += cameraSpeed * speedModifier * shipSpeed; // Przesunięcie w prawo
             }
         
             // Opcjonalnie: rotacja kamery
