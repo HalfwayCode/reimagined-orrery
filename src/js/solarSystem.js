@@ -236,7 +236,7 @@ export function solar(THREE, OrbitControls) {
         planets.forEach((item, index) => {
             const { planet, pivot } = item;
             pivot.rotation.y += (baseSpeed * speedModifier) / (index + 1);
-            planet.rotation.y += baseSpeed * speedModifier / (index + 11);
+            planet.rotation.y += baseSpeed* 5 * speedModifier / (index + 11);
         });
 
         kek = getIndependentPosition(cameraObject);
