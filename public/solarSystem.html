@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Page</title>
+
+    <link rel="stylesheet" href="../src/styles/style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="solar-system"></div>
+
+    <script type="module">
+        import { solar } from '../src/js/solarSystem.js';
+        import * as THREE from 'three';
+        import { OrbitControls } from 'OrbitControls';
+
+        solar(THREE, OrbitControls);
+    </script>
+</body>
+</html>

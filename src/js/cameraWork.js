@@ -2,6 +2,6 @@
 
 export function cameraWork()
 {
-console.log("cześ");
+    //console.log("cześ");
 }
 
