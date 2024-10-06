@@ -103,7 +103,7 @@ export function solar(THREE, OrbitControls) {
         return ring;
     }
     
-    function createPlanet(size, color, distance, name, description) {
+    function createPlanet(size, color, distance, name, description, distanceFromSun, orbitalPeriod, numberOfMoons, type) {
         const planetTexture = new THREE.TextureLoader().load(`../../src/assets/textures/2k_${name.toLowerCase()}.jpg`)
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
         const planetMaterial = new THREE.MeshLambertMaterial({ map: planetTexture });
