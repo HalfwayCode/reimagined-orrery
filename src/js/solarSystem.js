@@ -1,4 +1,10 @@
 import { cameraWork } from './cameraWork.js';
+import { EffectComposer } from 'EffectComposer';
+import { RenderPass } from 'RenderPass';
+import { UnrealBloomPass } from 'UnrealBloomPass';
+import { FilmPass } from 'FilmPass';
+import { SMAAPass } from 'SMAAPass';
+
 
 export function solar(THREE, OrbitControls) {
     const scene = new THREE.Scene();
@@ -11,6 +17,21 @@ export function solar(THREE, OrbitControls) {
     let kek;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+
+    //composer do post processingu
+    const composer = new EffectComposer(renderer);
+
+    const renderPass = new RenderPass( scene, camera );
+    composer.addPass( renderPass );
+
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 5, 0.4, 0.9);
+    composer.addPass(bloomPass);
+
+    const filmPass = new FilmPass( 0.2, 0.3, 1 , 0);
+    composer.addPass(filmPass);
+
+    const smaaPass = new SMAAPass();
+    composer.addPass(smaaPass);
     
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
@@ -34,7 +55,7 @@ export function solar(THREE, OrbitControls) {
     infoSection.style.display = 'none'; // Initially hidden
     document.body.appendChild(infoSection);
 
-    const light = new THREE.PointLight(0xffffff, 2, 100);
+    const light = new THREE.PointLight(0xffffff, 1, 50);
     light.position.set(0, 0, 0);
     scene.add(light);
     
@@ -57,7 +78,15 @@ export function solar(THREE, OrbitControls) {
     const solarSystemGroup = new THREE.Group();
     solarSystemGroup.add(sun);
     scene.add(solarSystemGroup);
-        
+
+    function createRing(size, color) {
+        const ringGeometry = new THREE.RingGeometry(size, size + 0.1, 32); // Zewnętrzny promień + grubość
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.rotation.x = Math.PI / 2; // Ustawienie pierścienia w poziomie
+        return ring;
+    }
+    
     function createPlanet(size, color, distance, name, description) {
         const planetTexture = new THREE.TextureLoader().load(`../../src/assets/textures/2k_${name.toLowerCase()}.jpg`)
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
@@ -73,6 +102,12 @@ export function solar(THREE, OrbitControls) {
         planet.position.set(distance, 0, 0);
         pivot.add(planet);
         console.log(planet.position.x);
+
+        if (name.toLowerCase() === 'saturn') {
+            const ring = createRing(size * 5, 0xcccccc); // Ustal odpowiednią wielkość i kolor
+            ring.position.set(distance, 0, 0);
+            pivot.add(ring); // Dodaj pierścień do obiektu pivot
+        }
 
         return { planet, pivot };
     }
@@ -161,7 +196,7 @@ export function solar(THREE, OrbitControls) {
             kek.z);
         camera.position.set(kek.x,kek.y,kek.z+5)
         controls.update();
-        renderer.render(scene, camera);
+        composer.render(scene, camera);
 
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(celestialBodies);
