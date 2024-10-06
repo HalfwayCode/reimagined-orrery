@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
-import { solar } from './solarSystem.js';
 import { solarKeppler } from './solarKeppler.js';
 
 document.addEventListener('DOMContentLoaded', function () {
