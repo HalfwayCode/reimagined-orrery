@@ -37,18 +37,28 @@ export function solar(THREE, OrbitControls) {
     light.position.set(0, 0, 0);
     scene.add(light);
     
+    //setting background image
+    const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_stars_milky_way.jpg');
+    scene.background = spaceTexture;
+
+    //load textures
+    const sunTexture = new THREE.TextureLoader().load('../../src/assets/textures/2k_sun.jpg');
+    
     const sunGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture });
     const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+
     sun.userData = { name: "Sun", description: "The Sun is the star at the center of the Solar System." };
     scene.add(sun);
+
     const solarSystemGroup = new THREE.Group();
     solarSystemGroup.add(sun);
     scene.add(solarSystemGroup);
         
     function createPlanet(size, color, distance, name, description) {
+        const planetTexture = new THREE.TextureLoader().load(`../../src/assets/textures/2k_${name.toLowerCase()}.jpg`)
         const planetGeometry = new THREE.SphereGeometry(size, 32, 32);
-        const planetMaterial = new THREE.MeshLambertMaterial({ color: color });
+        const planetMaterial = new THREE.MeshLambertMaterial({ map: planetTexture });
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
         planet.userData = { name, description };
