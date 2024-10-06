@@ -126,3 +126,21 @@ b {
     border-radius: 50%; 
     background: #fff; 
 }
+
+.page-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black; /* Black screen for transition */
+    z-index: 9999; /* Ensure it appears above everything */
+    opacity: 0; /* Initially invisible */
+    pointer-events: none;
+    transition: opacity 0.5s ease; /* Smooth transition effect */
+}
+
+.page-transition.active {
+    opacity: 1; /* Visible when the class is active */
+    pointer-events: auto; /* Allow interaction while fading */
+}
