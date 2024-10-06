@@ -139,6 +139,14 @@ export function solar(THREE, OrbitControls) {
     // Wywołaj funkcję ładującą statek
     loadShip();
 
+    function createOrbit(radius) {
+        const orbitGeometry = new THREE.RingGeometry(radius, radius + 0.01, 64); // Ustaw promień orbity i jej grubość
+        const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+        const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+        orbit.rotation.x = Math.PI / 2; // Ustawienie orbity poziomo
+        return orbit;
+    }
+
     function createRing(size, color) {
         const ringGeometry = new THREE.RingGeometry(size, size + 0.5, 64); // Zewnętrzny promień + grubość
         const ringMaterial = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.31 });
@@ -168,16 +176,21 @@ export function solar(THREE, OrbitControls) {
     
         planet.position.set(distance, 0, 0);
         pivot.add(planet);
-        console.log(planet.position.x);
-
+    
+        // Add orbit for the planet
+        const orbit = createOrbit(distance); 
+        scene.add(orbit); // Add orbit directly to the scene, so it's visible
+        
+        // For Saturn, we add a ring
         if (name.toLowerCase() === 'saturn') {
             const ring = createRing(size * 1.5, 0x998e77); // Ustal odpowiednią wielkość i kolor
             ring.position.set(distance, 0, 0);
-            pivot.add(ring); // Dodaj pierścień do obiektu pivot
+            pivot.add(ring); // Add ring to the pivot
         }
-
+    
         return { planet, pivot };
     }
+    
     
 
     const planets = [
