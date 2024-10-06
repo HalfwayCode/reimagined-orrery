@@ -2,7 +2,7 @@ import { cameraWork } from './cameraWork.js';
 
 export function solar(THREE, OrbitControls) {
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -11,7 +11,7 @@ export function solar(THREE, OrbitControls) {
     let kek;
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    
+    let cameraMode=0;
     // Create a div to display the planet/sun name
     const objectNameDiv = document.createElement('div');
     objectNameDiv.style.position = 'absolute';
@@ -105,9 +105,10 @@ export function solar(THREE, OrbitControls) {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
     
+    
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('click', onMouseClick, false);
-
+    
     function onMouseMove(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -115,6 +116,7 @@ export function solar(THREE, OrbitControls) {
         objectNameDiv.style.left = event.clientX + 10 + 'px';
         objectNameDiv.style.top = event.clientY + 10 + 'px';
     }
+    
     
     function onMouseClick(event) {
         raycaster.setFromCamera(mouse, camera);
@@ -124,11 +126,14 @@ export function solar(THREE, OrbitControls) {
 
             cameraObject = clickedObject;
             const independentPosition = getIndependentPosition(clickedObject);
+            cameraMode=1;
             // Display detailed info about the clicked planet/sun
             infoSection.innerHTML = `<h2>${clickedObject.userData.name}</h2><p>${clickedObject.userData.description}</p>`;
             infoSection.style.display = 'block';
         } else {
             // Hide the info section if clicked on empty space
+            infoSection.style.display = 'none';
+            cameraMode=0;
             infoSection.style.display = 'none';
         }
     }
@@ -154,12 +159,9 @@ export function solar(THREE, OrbitControls) {
             const { planet, pivot } = item;
             pivot.rotation.y += 0.01 / (index + 1);
         });
-        cameraWork();
+
         kek = getIndependentPosition(cameraObject);
-        controls.target.set(kek.x,
-            kek.y,
-            kek.z);
-        camera.position.set(kek.x,kek.y,kek.z+5)
+        cameraWork(kek,controls,camera,cameraMode);
         controls.update();
         renderer.render(scene, camera);
 
