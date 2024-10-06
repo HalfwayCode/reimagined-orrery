@@ -2,11 +2,23 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: 'Poppins';
+    /*font-family: 'Poppins';*/
 }
 
 body {
     transition: transform 0.8s ease;
+    font-family: 'Comfortaa', sans-serif; /* Zmień 'Roboto' na wybrany font */
+    font-size: 16px; /* Opcjonalnie, możesz ustawić rozmiar czcionki */
+    line-height: 1.5; /* Opcjonalnie, możesz ustawić wysokość wiersza */
+    color: #333; /* Kolor tekstu (opcjonalnie) */
+}
+
+h1, h2, h3 {
+    font-family: 'Comfortaa', sans-serif;
+}
+
+p {
+    font-family: 'Comfortaa', sans-serif;
 }
 
 .slide-up {

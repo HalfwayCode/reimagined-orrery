@@ -58,13 +58,17 @@ export function solar(THREE, OrbitControls) {
     const light = new THREE.PointLight(0xffffff, 1, 50);
     light.position.set(0, 0, 0);
     scene.add(light);
+
+    //oswietlenie ambient
+    const ambientLight = new THREE.AmbientLight(0x1c1c1c);
+    scene.add(ambientLight);
     
     //setting background image
     const spaceTexture = new THREE.TextureLoader().load('../../src/assets/textures/8k_stars_milky_way.jpg');
     scene.background = spaceTexture;
 
     //Utwórz sferę jako tło
-    const sphereGeometry = new THREE.SphereGeometry(1500, 128, 128); // Duży promień
+    const sphereGeometry = new THREE.SphereGeometry(800, 128, 128); // Duży promień
     const sphereMaterial = new THREE.MeshBasicMaterial({
         map: spaceTexture,
         side: THREE.BackSide // Odwróć materiał, aby był widoczny z wnętrza
