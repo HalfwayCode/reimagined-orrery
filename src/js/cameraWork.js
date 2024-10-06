@@ -22,4 +22,5 @@ export function cameraWork(positions, controls, camera,cameraMode) {
     
     // Aktualizuj kontroler po wprowadzeniu zmian
     }
+
 }
